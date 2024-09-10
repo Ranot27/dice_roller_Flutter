@@ -1,3 +1,3 @@
 # dice_roller
 
-A new Flutter for rolling dices
+A new Flutter app for rolling dnd dices
