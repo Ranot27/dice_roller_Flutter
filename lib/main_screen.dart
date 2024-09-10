@@ -4,17 +4,18 @@ import 'package:provider/provider.dart';
 
 import 'model.dart';
 
+// Класс начальной страницы
 class StartingPage extends StatelessWidget {
   StartingPage({super.key});
 
   @override
   Widget build(BuildContext context) {
 
-    final dices = Provider.of<DiceRollModel>(context).dices;
+    final dices = Provider.of<DiceRollModel>(context).dices; // Из модели достаю список кубиков
 
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: const RollNumberBar(),
+        flexibleSpace: const RollNumberBar(), //Закидываю в flexibleSpace, чтобы сделать её кастомной
       ),
       body: GridView.count(
         crossAxisCount: 2,
@@ -25,18 +26,19 @@ class StartingPage extends StatelessWidget {
   }
 }
 
+// Класс с кнопкой для перехода на второй экран с историей бросков
 class BottomBar extends StatelessWidget {
   const BottomBar({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
-      elevation: 0,
-      color: Theme.of(context).colorScheme.background,
+      elevation: 0, // Чтобы цвет фона был как у остальной части экрана
+      color: Theme.of(context).colorScheme.surface,
       child: ElevatedButton(
         onPressed: () {
           Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const SecondScreen()));
+              MaterialPageRoute(builder: (context) => const SecondScreen())); // Переход на второй экран с помощью Navigator 1.0
         },
         style: const ButtonStyle(elevation: WidgetStatePropertyAll(10.0)),
         child: const Text("История бросков"),
@@ -45,6 +47,8 @@ class BottomBar extends StatelessWidget {
   }
 }
 
+
+//Класс AppBar c текстом и кнопками для изменения количества бросков
 class RollNumberBar extends StatefulWidget {
   const RollNumberBar({super.key});
 
@@ -55,7 +59,7 @@ class RollNumberBar extends StatefulWidget {
 class _RollNumberBarState extends State<RollNumberBar> {
   @override
   Widget build(BuildContext context) {
-    var model = Provider.of<DiceRollModel>(context);
+    var model = Provider.of<DiceRollModel>(context); // Берём модель из Provider
     return SafeArea(
       child: Column(
         children: [
@@ -68,16 +72,16 @@ class _RollNumberBarState extends State<RollNumberBar> {
                 children: [
                   ElevatedButton(
                       onPressed: () {
-                        model.decrease();
+                        model.decrease(); // По нажатию уменьшаем количество бросков в модели на 1
                       },
                       onLongPress: () {
-                        model.reset();
+                        model.reset(); // При долгом нажатии уменьшаем количество бросков до 1
                       },
                       child: const Icon(Icons.exposure_minus_1)),
                   Text('Количество бросков: ${model.numberOfRolls}'),
                   ElevatedButton(
                       onPressed: () {
-                        model.increase();
+                        model.increase(); // По нажатию увеличиваем количество бросков в модели на 1
                       },
                       child: const Icon(Icons.plus_one)),
                 ],
@@ -90,11 +94,12 @@ class _RollNumberBarState extends State<RollNumberBar> {
   }
 }
 
+
+//Класс виджета в виде кубика, дающий сделать бросок по нажатию
 class DiceTile extends StatelessWidget {
   const DiceTile(this.dice, {super.key});
 
   final Dice dice;
-
 
   @override
   Widget build(BuildContext context) {
@@ -103,14 +108,15 @@ class DiceTile extends StatelessWidget {
       child: GestureDetector(
         child: Image.asset(dice.image),
         onTap: () {
-          var rolls = rollResult(Provider.of<DiceRollModel>(context, listen: false).numberOfRolls);
-          _dialog(context, rolls);
-          Provider.of<DiceRollModel>(context, listen: false).addInAllRolls(diceNumber: dice.number, rolls: rolls);
+          var rolls = rollResult(Provider.of<DiceRollModel>(context, listen: false).numberOfRolls); // Получаем список бросков
+          _dialog(context, rolls); // Создаём диалог с результатом бросков
+          Provider.of<DiceRollModel>(context, listen: false).addInAllRolls(diceNumber: dice.number, rolls: rolls); // Записываем броски в модель
         },
       ),
     );
   }
 
+  //Асинхронная функция для создания диалогово окна с результатами броска
   Future<void> _dialog(BuildContext context, List<int> rolls) {
     return showDialog(
         context: context,
@@ -127,6 +133,7 @@ class DiceTile extends StatelessWidget {
         });
   }
 
+  // Функция для создания текста для диалогового окна
   String makeDialogText(List<int> rolls) {
     var result = '';
     var sum = 0;
@@ -141,15 +148,13 @@ class DiceTile extends StatelessWidget {
     return "Сумма: $sum \nБроски: $result";
   }
 
+
+  // Функцию, делающая броски
   List<int> rollResult(int numberOfRolls) {
-    var result = 0;
     List<int> rolls = [];
-    var rollsString = '';
     for (int i = 0; i < numberOfRolls; i++) {
       var r = dice.rollDice();
-      result += r;
       rolls.add(r);
-      rollsString += "$r ";
     }
     return rolls;
   }

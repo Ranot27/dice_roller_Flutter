@@ -2,6 +2,8 @@ import 'package:dice_roller/model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+
+// Класс второго окна с историей бросков
 class SecondScreen extends StatefulWidget {
   const SecondScreen({super.key});
 
@@ -14,6 +16,8 @@ class _SecondScreenState extends State<SecondScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: const Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           DiceRollsText(diceNumber: 4),
           DiceRollsText(diceNumber: 6),
@@ -22,19 +26,17 @@ class _SecondScreenState extends State<SecondScreen> {
           DiceRollsText(diceNumber: 12),
           DiceRollsText(diceNumber: 20),
         ],
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.start,
       ),
       appBar: AppBar(
         leading: IconButton(
           onPressed: Navigator.of(context).pop,
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
         ),
-        title: Text("История бросков"),
+        title: const Text("История бросков"),
         actions: [
           ElevatedButton(
-            onPressed: () {Provider.of<DiceRollModel>(context).resetAllRolls();},
-            child: Icon(Icons.delete),
+            onPressed: () {Provider.of<DiceRollModel>(context, listen: false).resetAllRolls();}, //Кнопка для удаления истории бросков
+            child: const Icon(Icons.delete),
           )
         ],
       ),
@@ -42,6 +44,8 @@ class _SecondScreenState extends State<SecondScreen> {
   }
 }
 
+
+// Виджет для показа истории бросков по определённому кубику
 class DiceRollsText extends StatelessWidget {
   const DiceRollsText({super.key, required this.diceNumber});
 
@@ -49,18 +53,23 @@ class DiceRollsText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      Text(
-        'd$diceNumber',
-        style: const TextStyle(
-          fontSize: 24,
+    var l = 'd$diceNumber'.toString().length.toDouble();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(left: 50 - l), // Для выравнивания
+          child: Text(
+            'd$diceNumber',
+            style: const TextStyle(fontSize: 24),
+          ),
         ),
-      ),
-      Text(makeRollsText(
-          Provider.of<DiceRollModel>(context).getRolls(diceNumber)))
-    ]);
+        Text(makeRollsText(Provider.of<DiceRollModel>(context).getRolls(diceNumber))) //Создаём строку из истории бросков из модели
+      ]
+    );
   }
 
+  // Функция для создания строки из List<int>
   String makeRollsText(List<int> rolls) {
     var result = '';
     for (int i in rolls) {
